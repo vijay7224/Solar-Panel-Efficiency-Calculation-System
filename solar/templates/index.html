@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Solar Panel Efficiency Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Solar Panel Efficiency Predictor</h1>
+            <p>Estimate real-world efficiency based on your site's conditions</p>
+        </header>
+
+        <section class="form-section">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="ambient">Ambient Temperature (°C)</label>
+                    <input type="number" step="any" id="ambient" name="ambient" placeholder="e.g. 25–35" min="-10" max="50" required>
+                    <small>Typical range: 10–40°C</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="module">Module Temperature (°C)</label>
+                    <input type="number" step="any" id="module" name="module" placeholder="e.g. 40–65" min="0" max="90" required>
+                    <small>Often 15–30°C hotter than ambient</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="irradiation">Irradiation (W/m²)</label>
+                    <input type="number" step="any" id="irradiation" name="irradiation" placeholder="e.g. 500–1000" min="0" max="1500" required>
+                    <small>Peak sun ~1000 W/m²; cloudy ~200–500</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="dc_power">DC Power Output (W or kW?)</label>
+                    <input type="number" step="any" id="dc_power" name="dc_power" placeholder="e.g. 300–500 for single panel" min="0" required>
+                    <small>Actual measured output from panel/array</small>
+                </div>
+
+                <button type="submit">Calculate Predicted Efficiency</button>
+            </form>
+        </section>
+
+        {% if result %}
+            <section class="result-section">
+                <div class="result-card">
+                    <h3>Predicted Efficiency</h3>
+                    <div class="efficiency-value">{{ result }} %</div>
+                </div>
+            </section>
+        {% endif %}
+
+        <!-- Always visible reference sections -->
+        <section class="info-section">
+            <h2>Efficiency Benchmarks (2026 Commercial Panels)</h2>
+            <table class="info-table">
+                <thead>
+                    <tr>
+                        <th>Efficiency Range</th>
+                        <th>Meaning / Typical Panels</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>19% – 22%</td>
+                        <td>Good standard performance – most common residential & commercial panels today (e.g. many TOPCon, PERC monocrystalline)</td>
+                    </tr>
+                    <tr>
+                        <td>22% – 24.5%</td>
+                        <td>High / Premium performance – top-tier models (e.g. Maxeon 7 ~24.1%, some HJT / back-contact)</td>
+                    </tr>
+                    <tr>
+                        <td>&lt; 19%</td>
+                        <td>Lower than expected – possible issues: high heat, dirt, shading, low irradiation, aging, or data error</td>
+                    </tr>
+                    <tr>
+                        <td>&gt; 24.5%</td>
+                        <td>Very rare / unrealistic in field conditions – usually only lab records or emerging tandem/perovskite tech</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="tips-section">
+            <h2>Quick Insights</h2>
+            <ul>
+                <li><strong>Temperature impact</strong>: Most panels lose ~0.3–0.4% power per °C above 25°C (check your panel's temperature coefficient – lower is better, e.g. -0.27%/°C for premium models).</li>
+                <li><strong>Real-world vs STC</strong>: Efficiency shown here is usually relative to real conditions (not STC 1000 W/m², 25°C). High module temp reduces output significantly in hot climates like Madhya Pradesh summers.</li>
+                <li><strong>Need panel area or STC rating?</strong>: For the most accurate % efficiency, divide DC power by (Irradiance × Panel Area). If your backend uses a model/formula, consider adding system capacity (kWp) as an input.</li>
+                <li><strong>Typical degradation</strong>: Modern panels lose only ~0.4–0.6% per year – still >80–90% after 25 years.</li>
+            </ul>
+        </section>
+    </div>
+</body>
+</html>
